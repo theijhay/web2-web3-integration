@@ -1,0 +1,8 @@
+type Query {
+    getCounter: Int
+}
+
+type Mutation {
+    incrementCounter: Boolean
+    decrementCounter: Boolean
+}
