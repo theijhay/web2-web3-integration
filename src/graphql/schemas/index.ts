@@ -1,15 +1,16 @@
-import { gql } from 'apollo-server-express';
+import { mergeTypeDefs } from '@graphql-tools/merge';
+import { loadFilesSync } from '@graphql-tools/load-files';
 import { loadSchemaSync } from '@graphql-tools/load';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
 
-const blockchainSchema = loadSchemaSync('./blockchain.graphql', {
-  loaders: [new GraphQLFileLoader()]
-});
-const databaseSchema = loadSchemaSync('./database.graphql', {
-  loaders: [new GraphQLFileLoader()]
+const loadedSchemas = loadFilesSync('./src/graphql/schemas/**/*.graphql', {
+  extensions: ['graphql'],
 });
 
-export const typeDefs = gql`
-    ${blockchainSchema}
-    ${databaseSchema}
-`;
+const additionalSchema = loadSchemaSync('./src/graphql/schemas/database.graphql', {
+  loaders: [new GraphQLFileLoader()],
+});
+
+const mergedTypeDefs = mergeTypeDefs([...loadedSchemas, additionalSchema]);
+
+export const typeDefs = mergedTypeDefs;
